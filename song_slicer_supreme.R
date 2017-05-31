@@ -123,7 +123,11 @@ plot(all_tracks_feats[,1:13], col = all_tracks_feats$lbl_col)
 dev.off()
 
 
+<<<<<<< HEAD
 #IMPORT AND CLEAN "YOUR TRACKS" DATA
+=======
+#IMPORT AND CLEAN "YOUR TRACKS" DATA (WORD OF CAUTION THIS WHOLE CHUNK IS HACKY AS A FUCK)
+>>>>>>> d6ab92fba80f650070e0d08a17892085d44cb07c
 my_albums <- get_my_albums()
 
 hold1 <- map_df(my_albums[1:100,2],get_album_tracks)
