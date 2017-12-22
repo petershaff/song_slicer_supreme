@@ -1,7 +1,6 @@
 library(tidyverse)
 library(httr)
 library(jsonlite)
-library(glmnet)
 
 #PRELIMINARIES/GET API TOKEN
 app_id <- 'song_slicer_supreme_CHOP_UP_YOUR_BEETS_IN_A_FLASH'
@@ -118,16 +117,8 @@ all_tracks_feats[all_tracks_feats$plylst=='beats',]$plylst_lbl <- 1
 all_tracks_feats$'lbl_col' <- rep('blue',dim(all_tracks_feats)[1])
 all_tracks_feats[all_tracks_feats$plylst=='beats',]$lbl_col <- 'red'
 
-png('feature_plots.png')
-plot(all_tracks_feats[,1:13], col = all_tracks_feats$lbl_col)
-dev.off()
 
-
-<<<<<<< HEAD
-#IMPORT AND CLEAN "YOUR TRACKS" DATA
-=======
 #IMPORT AND CLEAN "YOUR TRACKS" DATA (WORD OF CAUTION THIS WHOLE CHUNK IS HACKY AS A FUCK)
->>>>>>> d6ab92fba80f650070e0d08a17892085d44cb07c
 my_albums <- get_my_albums()
 
 hold1 <- map_df(my_albums[1:100,2],get_album_tracks)
@@ -157,31 +148,3 @@ new_dat <- apply(new_dat[,1:11], 2, function(x) {return(map_dbl(x, as.numeric))}
 
 #\BEGIN{STATISTICS}
 dat <- all_tracks_feats[,c(1:13,16)]
-logit_fit <- glm(plylst_lbl ~., data=dat, family=binomial)
-
-miss_rate <- sum(abs(round(fitted(logit_fit))-dat$plylst_lbl))/37
-misses <- all_tracks[dat$plylst_lbl != round(fitted(logit_fit)),21]
-
-predicted <- as.data.frame(cbind(all_tracks$name, as.numeric(100*fitted(logit_fit))))
-predicted <- predicted[order(fitted(logit_fit)),]
-names(predicted) <- c('Trck_Nm','Score')
-
-cv_fit <- cv.glmnet( as.matrix(dat[,1:11]), dat[,14], family = 'binomial', type.measure = 'class', alpha=1)
-
-l0 <- cv_fit$'lambda.min'
-l2 <- cv_fit$'lambda.1se$'
-l1 <- mean(c(l0,l2))
-
-var_select <- map(c(l0,l1,l2), function(x) {return(coef(cv_fit, s=x))})
-
-oos_pred <- predict(cv_fit, newx = new_dat, type='response', s=l0)
-
-best_recs <- abs(oos_pred - .5) > .49
-rec_tracks <- as_data_frame(dat_names[best_recs])
-rec_tracks$score <- round(oos_pred[best_recs],4)
-names(rec_tracks) <- c('name','score')
-
-#Fun fact: when I swap Geotic's "Sunspell" for "Billionth Remnant I get perfect within-sample prediction, whereas otherwise I get about a 13% miss rate
-#test_id <- bleep_tracks$ids[1]
-#test_an <- get_track_analysis(test_id)
-
