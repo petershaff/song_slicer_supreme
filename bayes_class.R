@@ -10,10 +10,10 @@ covar.names <- c('danceability', 'energy', 'key', 'loudness', 'mode', 'speechine
 X <- dat[,covar.names]
 Y <- dat$'plylst_lbl'
 N <- dim(dat)[1]
-K <- dim(dat)[2] - 2
+K <- length(covar.names)
 
 #Fit vanilla model in Stan
-mod.file <- './stan_scripts/vanilla_mod.stan'
+mod.file <- './stan_scripts/vanilla.stan'
 
 iter  <- 4000
 stan.dat <- list(N=N, K=K, X=X, Y=Y)   
