@@ -1,11 +1,25 @@
 library(rstan)
+library(tidyverse)
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
-dat <- read.csv('track_dat.csv')
+#IMPORT DATA
+beats <- read.csv('./data/beats.csv')
+bleep <- read.csv('./data/bleep.csv')
+bangz <- read.csv('./data/bangz.csv')
+rando <- read.csv('./data/rando.csv')
+
+#BUILD TRAINING and TESTING DATA SETS
+train.samp.size <- 10
+
+train <- rbind( beats[ sample(nrow(beats), train.samp.size), ], bleep[ sample(nrow(beats), train.samp.size), ], bangz[ sample(nrow(beats), train.samp.size), ], rando[ sample(nrow(beats), 50), ] )
+test <- rbind( beats[ sample(nrow(beats), (nrow(beats) - train.samp.size) ), ], bleep[ sample(nrow(bleep), (nrow(bleep) - train.samp.size) ), ], bangz[ sample(nrow(bangz), (nrow(beats) - train.samp.size) ), ], rando[ sample(nrow(rando), (nrow(rando) - 50)), ])
+
 
 #All options for covariate names are: 'danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo', 'pitch', 'timbre', 'plylst_lbl'
 covar.names <- c('danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo', 'pitch', 'timbre')
+
+
 
 X <- dat[,covar.names]
 Y <- dat$'plylst_lbl'

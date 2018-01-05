@@ -91,9 +91,9 @@ get_rand_album_tracks <- function(album_id){
 #Get ids for relevant playlists
 playlist.ids <- get_playlists(user_id)
 
-bleep_id <- subset(playlists,playlists$names == 'BL33P C O R E')$ids
-beats_id <- subset(playlists,playlists$names == 'chewy beats')$ids
-bangz_id <- subset(playlists,playlists$names == 'bangers from beyond the stars')$ids
+bleep_id <- subset(playlist.ids, playlist.ids$names == 'BL33P C O R E')$ids
+beats_id <- subset(playlist.ids, playlist.ids$names == 'chewy beats')$ids
+bangz_id <- subset(playlist.ids, playlist.ids$names == 'bangers from beyond the stars')$ids
 
 #Pull track lists and then track features
 bleep_tracks <- get_playlist_tracks(user_id, bleep_id)
@@ -120,20 +120,19 @@ bangz$label <- rep('bangerz', dim(beats_tracks)[1])
 bangz <- subset(bangz, select = -c(type, uri, track_href, analysis_url, duration_ms, time_signature) )
 
 #IMPORT AND CLEAN RANDO TRACKS
-my_albums <- my_albs
-#my_albums <- get_my_albums()
+my_albums <- get_my_albums()
 my_albums <- my_albums[ sample( nrow(my_albums), 100 ), ]
 
 rando_tracks <- map_df(my_albums[,2], get_rand_album_tracks)
 
 rando <- map_df(rando_tracks$ids, get_track_features)
 
-rando$name <- rando_tracks$names
+rando$name <- rando_tracks$name
 rando$id <- rando_tracks$ids
 rando$label <- rep('rando', dim(rando_tracks)[1])
 rando <- subset(rando, select = -c(type, uri, track_href, analysis_url, duration_ms, time_signature) )
 
-write.csv(beats, './data/beats.csv')
-write.csv(bleep, './data/bleep.csv')
-write.csv(bangz, './data/bangz.csv')
-write.csv(rando, './data/rando.csv')
+write.csv(beats, './data/beats.csv', row.names=FALSE)
+write.csv(bleep, './data/bleep.csv', row.names=FALSE)
+write.csv(bangz, './data/bangz.csv', row.names=FALSE)
+write.csv(rando, './data/rando.csv', row.names=FALSE)
